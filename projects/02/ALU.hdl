@@ -42,5 +42,47 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-   // Put you code here:
+    
+    //zx
+    Not16(in=x, out=notx);
+    And16(a=x, b=notx, out=zerox);
+    Mux16(a=x, b=zerox, sel=zx, out=xafterzx);
+
+    //zy
+    Not16(in=y, out=noty);
+    And16(a=y, b=noty, out=zeroy);
+    Mux16(a=y, b=zeroy, sel=zy, out=yafterzy);
+
+    //nx
+    Not16(in=xafterzx, out=notxafterzx);
+    Mux16(a=xafterzx, b=notxafterzx, sel=nx, out=xafternx);
+    
+    //ny
+    Not16(in=yafterzy, out=notyafterzy);
+    Mux16(a=yafterzy, b=notyafterzy, sel=ny, out=yafterny);
+
+    //add
+    Add16(a=xafternx, b=yafterny, out=xpy);
+
+    //and
+    And16(a=xafternx, b=yafterny, out=xandy);
+
+    //f
+    Mux16(a=xandy, b=xpy, sel=f, out=outafterf);
+
+    //no
+    Not16(in=outafterf, out=notoutafterf);
+    Mux16(a=outafterf, b=notoutafterf, sel=no, out=outt);
+    Or16(a=outt, b=outt, out=out);
+    
+    //ng
+    Or16(a=outt, b=outt, out[15]=ng);
+
+    //zr
+    Or16(a=outt, b=outt, out[0..7]=out07);
+    Or16(a=outt, b=outt, out[0..7]=out815);
+    Or8Way(in=out07, out=zr07);
+    Or8Way(in=out815, out=zr815);
+    Or(a=zr07, b=zr815, out=nzr);
+    Not(in=nzr, out=zr);
 }
